@@ -1,7 +1,9 @@
 # Robot parameters (scope-check reference)
 
-Any UNREQUESTED or UNCLEAR change to a parameter in this file is CRITICAL. These values decide
-where the pen goes, how fast it gets there, and whether the robot hits the bottle, the table or itself.
+Any UNREQUESTED or UNCLEAR change that alters, removes or loosens a parameter in this file, or sets
+one for the first time in new code, is CRITICAL.
+These values decide where the pen goes, how fast it gets there, and whether the robot hits the bottle,
+the table or itself. A new check that only stops the program on bad input is not CRITICAL.
 
 **Setup:** an ABB IRB 120 draws with a sharpie on a fixed, raised bottle or can that does not
 rotate. The pen is held at an angle to joint 6, in a rigid or a spring-loaded holder. The work goes
@@ -58,7 +60,7 @@ other variable names for the same things; judge by meaning, not only by name.
 
 ## 10. Work area limits and units
 - Unit conversions (mm and m, degrees and radians, Rhino model units, scale factors), bounding boxes, reach or joint-limit checks, clamps, collision or clearance checks, and world zones (`WZBoxDef`, `WZLimSup`, ...).
-- Risk: a silent scale error puts targets 1000 times off. Removing a limit lets unreachable or colliding targets through.
+- Risk: a silent scale error puts targets 1000 times off. Removing or loosening a limit lets unreachable or colliding targets through. Adding a check that only rejects bad input (wrong units, a value of 0 or less) is not CRITICAL; adding a clamp that moves targets is.
 
 ## Sources
 - Robot Components documentation: Move, Speed Data, Zone Data, Robot Target, Robot Tool, Work Object, Robot Presets, Robot Joint Position, Joint Target, Set Linear Configuration Control.

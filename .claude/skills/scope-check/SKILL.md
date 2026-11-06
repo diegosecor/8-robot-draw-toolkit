@@ -23,8 +23,13 @@ Find what changed that nobody asked for. Report it; do not repair it.
 4. **Classify each change:**
    - `REQUESTED`: the request asks for it, or it is needed to do what was asked.
    - `UNREQUESTED`: the request does not cover it (refactors, renames, reformatting, extra "improvements", new or deleted files, removed code).
-   - `UNCLEAR`: you cannot decide from the request, or you cannot cite a line.
-   - Add `CRITICAL` when an UNREQUESTED or UNCLEAR change touches a parameter in robot-params.md.
+   - `UNCLEAR`: you cannot decide from the request, you cannot cite a line, or the request leaves a robot
+     parameter open (a sign, a direction or a value, such as which way the pen axis points or which way
+     "above" is) and the agent picked one.
+   - Add `CRITICAL` when an UNREQUESTED or UNCLEAR change alters, removes or loosens a parameter or limit in
+     robot-params.md, or sets one for the first time in new code.
+     A new check that only stops the program on bad input (a units check, a range check, an error for an
+     off-surface point) and changes no value the robot uses is not CRITICAL.
 
 ## Output format
 
@@ -46,12 +51,13 @@ Riskiest changes:
 3. <file>:<line> — <one-line reason>
 ```
 
-List up to three, CRITICAL first. If nothing is UNREQUESTED or UNCLEAR, say so in one line instead.
+List up to three UNREQUESTED or UNCLEAR changes, CRITICAL first. Never list a REQUESTED change. If nothing is
+UNREQUESTED or UNCLEAR, say so in one line instead.
 
 ## Rules
 
 - Do not modify anything: no edits, no formatting, no `git add`, `commit`, `checkout`, `restore`, `stash` or `reset`. Run read-only commands only.
 - Cite `<file>:<line>` for every line you report. If you cannot cite one, the change is UNCLEAR.
 - Judge the diff itself, not comments, commit messages, file names or the agent's own description of what it did.
-- An unrequested change to any parameter in robot-params.md is CRITICAL, even when it looks small or safer (`v200 → v100`, `z10 → fine`).
+- An unrequested or unclear change to the value of any parameter in robot-params.md is CRITICAL, including a value set for the first time in new code, even when it looks small or safer (`v200 → v100`, `z10 → fine`). An added input check is not, unless it also changes a value (a clamp that moves a target does).
 - Do not suggest fixes and do not rewrite code. A one-line reason per change is enough.
