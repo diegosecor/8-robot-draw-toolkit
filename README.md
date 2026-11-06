@@ -1,6 +1,9 @@
 # Robot Draw Toolkit
 
-`>>> DIEGO: WRITE THIS <<<`
+For now, I want to draw on a glass bottle. It draws with a Sharpie marker. The toolkit helps to
+generate better Grasshopper files for generating the drawings, and it also helps to generate the
+robot's workflow in RobotStudio. The toolkit is useful because I don't have many references for
+this type of project. It gives me skills or movement references.
 
 ## What the skill does and when it triggers
 
