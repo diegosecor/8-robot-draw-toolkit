@@ -4,14 +4,18 @@
 - SearchTests call search_robot_papers directly against the real index in data/chroma_store.
 - StdioTests start server.py as a subprocess and talk to it over stdio with the official
   MCP client, like Claude Code does.
-The last two groups are skipped when the index has not been built (run ingest.py first).
+- MinimalEnvironmentTests search from a child process that has almost no environment
+  variables, like a client that passes only a few to the server.
+The last three groups are skipped when the index has not been built (run ingest.py first).
 
 Run from the repository root:  .venv/Scripts/python.exe -m unittest discover -s tests -v
 """
 import asyncio
 import contextlib
 import io
+import os
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -82,6 +86,15 @@ class UnavailableIndexTests(unittest.TestCase):
     def test_empty_query_is_rejected_politely(self):
         self.assertIn("Empty query", server.search_robot_papers("   "))
 
+    def test_unexpected_errors_opening_the_index_are_reported_not_raised(self):
+        # Real case: with only SYSTEMROOT in the environment, importing chromadb raised this
+        # inside open_index, and the client only saw "Error executing tool search_robot_papers".
+        error = RuntimeError("Could not determine home directory.")
+        with mock.patch.object(server, "open_index", side_effect=error), \
+                self.assertLogs(server.log, level="ERROR"):
+            out = server.search_robot_papers("pen pressure")
+        self.assertIn("Search failed: RuntimeError: Could not determine home directory.", out)
+
 
 @unittest.skipUnless(INDEX_BUILT, "index not built: run mcp_server/ingest.py")
 class SearchTests(unittest.TestCase):
@@ -139,6 +152,23 @@ class StdioTests(unittest.TestCase):
         text = "".join(block.text for block in result.content if block.type == "text")
         self.assertEqual(len(PASSAGE_LINE.findall(text)), 3, text)
         self.assertIn("query 'map a 2D drawing onto a bottle'", server_log)  # logs reached stderr
+
+
+@unittest.skipUnless(INDEX_BUILT, "index not built: run mcp_server/ingest.py")
+class MinimalEnvironmentTests(unittest.TestCase):
+    def test_search_works_without_a_home_directory(self):
+        # Windows Python needs SYSTEMROOT to start at all; every other variable is left out,
+        # so Path.home() fails in the child unless server.py provides a fallback.
+        env = {name: os.environ[name] for name in ("SYSTEMROOT",) if name in os.environ}
+        code = ("import sys; sys.stdout.reconfigure(encoding='utf-8'); sys.path.insert(0, sys.argv[1]); "
+                "import server; print(server.search_robot_papers('zonedata fine z10', k=2))")
+        proc = subprocess.run([sys.executable, "-c", code, str(ROOT / "mcp_server")], env=env,
+                              cwd=tempfile.gettempdir(), capture_output=True, text=True,
+                              encoding="utf-8", timeout=300)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(len(PASSAGE_LINE.findall(proc.stdout)), 2, proc.stdout + proc.stderr)
+        if os.name == "nt":
+            self.assertIn("no home directory in the environment", proc.stderr)
 
 
 if __name__ == "__main__":

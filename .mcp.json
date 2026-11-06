@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "robot-draw-toolkit": {
+      "type": "stdio",
+      "command": "C:/Users/diego/OneDrive/Desktop/1s MSCD/EFFECTIVE CODING WITH AI 15113/114/3WEEK/HW8/.venv/Scripts/python.exe",
+      "args": [
+        "C:/Users/diego/OneDrive/Desktop/1s MSCD/EFFECTIVE CODING WITH AI 15113/114/3WEEK/HW8/mcp_server/server.py"
+      ]
+    }
+  }
+}

@@ -14,6 +14,7 @@ Normally the MCP client starts it. To run it by hand, from the repository root:
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import threading
 import urllib.parse
@@ -30,6 +31,25 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logging.getLogger("httpx").setLevel(logging.WARNING)
 log = logging.getLogger("robot-draw-toolkit")
+
+
+def ensure_home_dir() -> None:
+    """Give this process a home directory when the MCP client did not pass one.
+
+    chromadb calls Path.home() while it is imported, and on Windows that needs USERPROFILE.
+    A client that starts the server with only a few environment variables would make every
+    search fail. chromadb only uses the home directory for its default embedding model,
+    which this server never loads, so data/ is a safe stand-in. Only this process is affected.
+    """
+    try:
+        Path.home()
+    except RuntimeError:
+        fallback = ingest.ROOT / "data"
+        os.environ["USERPROFILE" if os.name == "nt" else "HOME"] = str(fallback)
+        log.warning("no home directory in the environment; using %s", fallback)
+
+
+ensure_home_dir()
 
 MAX_K = 10           # most passages one call may return
 SNIPPET_WORDS = 80   # passages are ~200 words; the encoder only reads the first ~74, so show those
@@ -197,19 +217,18 @@ def search_robot_papers(query: str, k: int = 5) -> str:
     k = max(1, min(int(k), MAX_K))
     try:
         collection = open_index()
-    except IndexUnavailable as exc:
-        log.warning("index unavailable: %s", exc)
-        return (f"The paper index is not available: {exc}.\n"
-                f"Build it from the repository root with:\n    {INGEST_COMMAND}\n"
-                "then call search_robot_papers again.")
-    try:
         vector = next(iter(get_model().embed([query]))).tolist()
         result = collection.query(query_embeddings=[vector], n_results=k,
                                   include=["metadatas", "documents", "distances"])
         hits = [(1.0 - distance, meta, text) for meta, text, distance
                 in zip(result["metadatas"][0], result["documents"][0], result["distances"][0])]
         total = collection.count()
-    except Exception as exc:  # noqa: BLE001 - report to the agent instead of failing the call
+    except IndexUnavailable as exc:
+        log.warning("index unavailable: %s", exc)
+        return (f"The paper index is not available: {exc}.\n"
+                f"Build it from the repository root with:\n    {INGEST_COMMAND}\n"
+                "then call search_robot_papers again.")
+    except Exception as exc:  # noqa: BLE001 - also covers chromadb failing to import; report, don't raise
         log.exception("search failed for query %r", query)
         return f"Search failed: {type(exc).__name__}: {exc}. The server log (stderr) has the details."
     log.info("query %r -> %d passages", query, len(hits))
