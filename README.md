@@ -1,24 +1,24 @@
 # Robot Draw Toolkit
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## What the skill does and when it triggers
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## What the MCP tool does
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## The friction that motivated each
 
 ### The skill (scope-check)
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ### The MCP tool (search_robot_papers)
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## Technical setup
 
@@ -157,12 +157,12 @@ The skill only reads: it needs `git` and a git repository with the changes to ch
 
 ## Which tools I confirmed it works in
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## Borrowed or adapted
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
 
 ## How I used AI on this assignment
 
->>> DIEGO: WRITE THIS <<<
+`>>> DIEGO: WRITE THIS <<<`
