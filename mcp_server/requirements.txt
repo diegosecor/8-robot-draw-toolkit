@@ -1,0 +1,7 @@
+# Pinned direct dependencies for the Robot Draw Toolkit MCP server and its ingest script.
+# chromadb and fastembed match the versions used in HW6 (114-mscd-thesis-orbit).
+chromadb==1.5.9
+fastembed==0.9.0
+pypdf==6.20.1
+# Official MCP Python SDK. In 2.x the FastMCP class is named MCPServer (from mcp.server import MCPServer).
+mcp==2.3.0

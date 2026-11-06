@@ -1,0 +1,23 @@
+# Course material and Grasshopper example files (local reference only)
+reference/
+
+# Local data: PDFs are copyrighted, vectors and model weights are rebuilt locally.
+# Only .gitkeep placeholders are committed.
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Personal Claude Code settings (not shared)
+.claude/settings.local.json
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
