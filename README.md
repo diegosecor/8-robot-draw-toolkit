@@ -7,21 +7,34 @@ this type of project. It gives me skills or movement references.
 
 ## What the skill does and when it triggers
 
-`>>> DIEGO: WRITE THIS <<<`
+It reviews a change made by an agent and reports EVERYTHING that was modified without me asking for
+it. It does not fix anything. It marks as CRITICAL the unrequested changes to the robot's safety
+parameters.
+
+When: after an agent edits code, a GHPython script, a Grasshopper export or a RAPID module, before
+running it in RobotStudio or on the robot, or when asked to check what changed.
 
 ## What the MCP tool does
 
-`>>> DIEGO: WRITE THIS <<<`
+Semantic search (like in HW6) over papers and documentation on robotic drawing on curved surfaces,
+ABB/RAPID and Robot Components. It compares with references and gives me ideas. I use it to
+generate the paths for drawing with the robot.
 
 ## The friction that motivated each
 
 ### The skill (scope-check)
 
-`>>> DIEGO: WRITE THIS <<<`
+From my HW6 prompt log (`prompt_log.md`, translated prompts):
+
+- "I feel that you changed the way orbiting works; the zoom moves."
+- "I DO NOT WANT THE CLOUD TO MOVE; IT SHOULD STAY WHERE IT IS."
+- "No, it looks very bad. Align it at the side as before, do not put it inside a box, and use the previous font."
 
 ### The MCP tool (search_robot_papers)
 
-`>>> DIEGO: WRITE THIS <<<`
+From my HW6 prompt log (`prompt_log.md`):
+
+- "I cannot see Carla Flores's project; is it included?"
 
 ## Technical setup
 
@@ -160,12 +173,34 @@ The skill only reads: it needs `git` and a git repository with the changes to ch
 
 ## Which tools I confirmed it works in
 
-`>>> DIEGO: WRITE THIS <<<`
+Claude Code.
+
+Yes, it worked: I tested it (`bottle_targets.py`) in Rhino. It is useful because I am doing
+something very specific.
 
 ## Borrowed or adapted
 
-`>>> DIEGO: WRITE THIS <<<`
+- My HW6 project (`mscd-thesis-orbit`): the semantic search and the index (same embedding model,
+  ChromaDB and FastEmbed), adapted in `mcp_server/ingest.py`.
+- The `spec-check` example in the HW8 assignment: the structure of the checker skill (fixed output
+  format, "do not fix anything", cite file and line).
+- The Agent Skills format (agentskills.io) and the official MCP Python SDK (`mcp`).
+- The sources in the index: the Robot Components documentation, the ABB manuals (IRB 120 product
+  specification and RAPID reference) and the open-access papers listed in `mcp_server/sources.csv`.
+- My Robot Components example files (`BASIC_05_Setup_of_robot_info_IRB120.gh` and
+  `ITAR_Robot_Components_Introduction_1.gh`): the component names used in `robot-params.md`.
 
 ## How I used AI on this assignment
 
-`>>> DIEGO: WRITE THIS <<<`
+- Me: I designed the system architecture, created the RAG database for the search tool, wrote the
+  logic and rules of the `scope-check` skill, directed the iterations (v1 to v3) and
+  tested/visually verified the generated algorithms inside Rhino and Grasshopper.
+- The AI (agent/Opus): it consulted the literature through MCP and wrote the code of
+  `bottle_targets.py` to map 2D curves onto the 3D surface of the bottle.
+- The AI (reviewer/Sonnet): it audited the code differences (git diff) in an independent session,
+  classifying the changes and identifying critical robotic safety risks.
+
+What caught my attention about working this way: the most powerful thing was decoupling code
+generation from quality control through an independent reviewer agent. Having an "automated safety
+audit" that reviews the diff before running commands on the robot is essential in robotics, where
+an implicit orientation or speed error can cause real physical collisions.
